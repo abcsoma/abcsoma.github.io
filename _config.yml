@@ -14,8 +14,8 @@ future: true
 # SNS settings
 RSS: false
 #weibo_username:     huxpro
-zhihu_username:     huxpro
-#github_username:    abcsoma
+#zhihu_username:     huxpro
+github_username:    abcsoma
 #twitter_username:   huxpro
 #facebook_username:  huxpro
 #linkedin_username:  firstname-lastname-idxxxx
@@ -59,7 +59,7 @@ kramdown:
 
 
 # Disqus settings
-disqus_username: hux
+# disqus_username: hux
 
 # Netease settings
 netease_comment: false
@@ -68,7 +68,7 @@ netease_comment: false
 
 # Analytics settings
 # Baidu Analytics 
-ba_track_id: 8626a6ce73fd83be7d0cf02c81bf4b6c
+# ba_track_id: 8626a6ce73fd83be7d0cf02c81bf4b6c
 
 # Google Analytics
 #ga_track_id: 'UA-49627206-1'            # Format: UA-xxxxxx-xx
