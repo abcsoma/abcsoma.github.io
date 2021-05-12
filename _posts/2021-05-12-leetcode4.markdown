@@ -164,7 +164,7 @@ class Solution {
 
 其实会产生死锁的情况只有两种，就是所有哲学家一起拿左边的叉子或者一起拿右边的叉子，只要设定一个规则就行了，比如偶数编号的先拿左边的叉子，奇数编号的先拿右边的叉子
 
-``` JAVA
+``` java
 class DiningPhilosophers {
     private final ReentrantLock[] lockList ={new ReentrantLock(),new ReentrantLock(),new ReentrantLock(),new ReentrantLock(),new ReentrantLock()};
     public DiningPhilosophers() {
