@@ -1,0 +1,207 @@
+---
+layout:     post
+title:      "5.12刷题"
+subtitle:   " \"LeetCode+NowCoder\""
+date:       2021-05-12 12:00:00
+author:     "Soma"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - LeetCode
+    - 笔记
+---
+
+## [ LeetCode   寻找两个正序数组的中位数](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/)
+
+> 给定两个大小分别为 `m` 和 `n` 的正序（从小到大）数组 `nums1` 和 `nums2`。请你找出并返回这两个正序数组的 **中位数** 。
+
+```
+输入：nums1 = [1,3], nums2 = [2]
+输出：2.00000
+解释：合并数组 = [1,2,3] ，中位数 2
+```
+
+### 1.合并数组
+
+归并排序，时间复杂度和空间复杂度都是 O(m+n)，不过这道题标为hard，应该不至于用这种方法。
+
+```java
+class Solution {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        int m = nums1.length;
+        int n = nums2.length;
+        int[] nums3 = new int[m+n];
+        if(m==0){
+            return n%2==0 ? (nums2[n/2]+nums2[n/2-1])/2.0 : nums2[n/2];
+        }
+        if(n==0){
+            return m%2==0 ? (nums1[m/2]+nums1[m/2-1])/2.0 : nums1[m/2];
+        }
+        int i = 0,j = 0,k = 0;
+        while(i<m && j<n){
+            if(nums1[i]>nums2[j]){
+                nums3[k++] = nums2[j++];
+            }else{
+                nums3[k++] = nums1[i++];
+            }
+        }
+        while(i<m){
+            nums3[k++] = nums1[i++];
+        }
+        while(j<n){
+            nums3[k++] = nums2[j++];
+        }
+        System.out.println(Arrays.toString(nums3));
+        int len = nums3.length;
+        System.out.println(len);
+        return len%2==0 ? (nums3[len/2]+nums3[len/2-1])/2.0 : nums3[len/2];
+    }
+}
+```
+
+### 2.合并的改版
+
+只要找到中位数就可以停止了，right记录遍历到的最后一个值，left记录它之前的一个值，因为不额外申请空间，空间复杂度为O(1)。
+
+```java
+class Solution {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        int m = nums1.length;
+        int n = nums2.length;
+        int len = m + n;
+        int left = -1, right = -1;
+        int aStart = 0, bStart = 0;
+        for (int i = 0; i <= len / 2; i++) {
+            left = right;
+            if (aStart < m && (bStart >= n || nums1[aStart] < nums2[bStart])) {
+                right = nums1[aStart++];
+            } else {
+                right = nums2[bStart++];
+            }
+        }
+        if ((len & 1) == 0)
+            return (left + right) / 2.0;
+        else
+            return right;
+    }
+}
+```
+
+### 3.二分法
+
+如上两种时间复杂度都达不到O(log (m+n))，这种复杂度一般都用二分法来实现。
+
+题目说是求中位数，其实就是求第k小的数的一种情况。
+
+```java
+[1,2,3,4,5,6,7] //如果m+n为奇数，则中位数就是这个合并数组中第(m+n)/2+1个元素
+[1,2,3,4,5,6] //如果m+n为偶数，则中位数就是这个合并数组中第(m+n)/2+1个元素和第(m+n)/2个元素的平均值
+```
+
+就是两个数组中第k+1小的数字，比较两个数组中第k/2个数字，k=(m+n)/2，哪个小，就说明哪个数组的前k/2个数字都不是第k+1小数字，排除然后继续。
+
+```java
+class Solution {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        int m = nums1.length;
+        int n = nums2.length;
+        int k = m + n;//总长度
+        if(k%2==1){
+            int mid = k/2+1;//这里的mid不是下标，是指第mid个数
+            return getKthElement(nums1,nums2,mid);
+        }else{
+            int mid1 = k/2,mid2 = k/2+1;
+            return (getKthElement(nums1,nums2,mid1)+getKthElement(nums1,nums2,mid2))/2.0;
+        }
+    }
+    public int getKthElement(int[] nums1,int[] nums2,int k){
+        //用来获取两个数组合并之后的第k小的数
+        int m = nums1.length;
+        int n = nums2.length;
+        int i = 0,j = 0;
+        while(true){
+            //如果nums1空了则，直接返回nums2的第k个数
+            if(i==m){
+                return nums2[j + k - 1];
+            }
+            if(j==n){
+                return nums1[i + k - 1];
+            }
+            //如果k为1，则看两个数组哪个第一个元素小
+            if(k==1){
+                return Math.min(nums1[i],nums2[j]);
+            }
+            //正常情况
+            int mid = k/2;
+            int new1 = Math.min(i + mid,m)-1;//如果剩下数组的长度小于k/2，那就直接比较剩下的数组
+            int new2 = Math.min(j + mid,n)-1;
+            int value1 = nums1[new1];//记录两个数组对应位置的值
+            int value2 = nums2[new2];
+            if(value1<=value2){
+                k -= (new1 - i + 1);
+                i = new1 +1;
+            }else{
+                k -= (new2 - j + 1);
+                j = new2 +1;
+            }
+        }
+    }
+}
+```
+这个方法略微有些复杂了，毕竟是hard题，还有一种解法不太想看了，如果让我做第二次我可能还是不会hhhh。
+
+-------------
+
+## [LeetCode 多线程 哲学家进餐](https://leetcode-cn.com/problems/the-dining-philosophers/)
+
+> 5 个沉默寡言的哲学家围坐在圆桌前，每人面前一盘意面。叉子放在哲学家之间的桌面上。（5 个哲学家，5 根叉子）
+>
+> 所有的哲学家都只会在思考和进餐两种行为间交替。哲学家只有同时拿到左边和右边的叉子才能吃到面，而同一根叉子在同一时间只能被一个哲学家使用。每个哲学家吃完面后都需要把叉子放回桌面以供其他哲学家吃面。只要条件允许，哲学家可以拿起左边或者右边的叉子，但在没有同时拿到左右叉子时不能进食。
+>
+> 假设面的数量没有限制，哲学家也能随便吃，不需要考虑吃不吃得下。
+>
+> 设计一个进餐规则（并行算法）使得每个哲学家都不会挨饿；也就是说，在没有人知道别人什么时候想吃东西或思考的情况下，每个哲学家都可以在吃饭和思考之间一直交替下去。
+
+其实会产生死锁的情况只有两种，就是所有哲学家一起拿左边的叉子或者一起拿右边的叉子，只要设定一个规则就行了，比如偶数编号的先拿左边的叉子，奇数编号的先拿右边的叉子
+
+``` JAVA
+class DiningPhilosophers {
+    private final ReentrantLock[] lockList ={new ReentrantLock(),new ReentrantLock(),new ReentrantLock(),new ReentrantLock(),new ReentrantLock()};
+    public DiningPhilosophers() {
+        
+    }
+
+    // call the run() method of any runnable to execute its code
+    public void wantsToEat(int philosopher,
+                           Runnable pickLeftFork,
+                           Runnable pickRightFork,
+                           Runnable eat,
+                           Runnable putLeftFork,
+                           Runnable putRightFork) throws InterruptedException {
+                               int leftFork = (philosopher+1)%5;//对应某编号哲学家左边的叉子的编号
+                               int rightFork = philosopher;//右边的叉子的编号
+                               if(philosopher%2==0){
+                                   lockList[leftFork].lock();//先拿左，这里只是加锁
+                                   lockList[rightFork].lock();//再拿右
+                               }else{
+                                   lockList[rightFork].lock();//先拿右
+                                   lockList[leftFork].lock();//再拿左
+                               }
+                               pickLeftFork.run();//这里是具体的执行
+                               pickRightFork.run();
+                               eat.run();//进餐
+                               putLeftFork.run();
+                               putRightFork.run();
+                               lockList[leftFork].unlock();//释放锁
+                               lockList[rightFork].unlock();
+        
+    }
+}
+```
+
+感觉这个一般不会问，大部分还是交替打印或者红绿灯这种。
+
+-------------
+
+——Soma 2021.5.12 22:16
+
