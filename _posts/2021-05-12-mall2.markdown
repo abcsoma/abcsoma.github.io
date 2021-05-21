@@ -24,7 +24,7 @@ vagrant up //运行容器
 vagrant ssh //连接
 ```
 
-![img](img/image-521-01.png)
+![img](https://github.com/abcsoma/abcsoma.github.io/blob/main/img/image-521-01.png)
 
 
 ### 网络设置
@@ -35,7 +35,7 @@ Vagrant 默认使用端口转发的方式 **需要绑定VirtualBox中的linux和
 
 打开Vagrantfile 修改<code>  config.vm.network "private_network", ip: "192.168.56.10"</code>使他和Windows中的virtualboxde IP地址前三个一样
 
-![img](img/image-521-02.png)
+![img](https://github.com/abcsoma/abcsoma.github.io/blob/main/img/image-521-02.png)
 
 然后ping一下测试一下，可以ping通就行了
 
@@ -59,7 +59,7 @@ Vagrant 默认使用端口转发的方式 **需要绑定VirtualBox中的linux和
 
 ### 开发
 
-![img](img/image-521-03.png)
+![img](https://github.com/abcsoma/abcsoma.github.io/blob/main/img/image-521-03.png)
 
 
 创建一些服务模块，如商品服务、会员服务、仓库服务、优惠券服务、订单服务等。
