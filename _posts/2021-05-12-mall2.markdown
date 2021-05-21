@@ -1,0 +1,78 @@
+---
+layout:     post
+title:      "Mall开发第二天"
+subtitle:   " \"Mall\""
+date:       2021-05-18 12:00:00
+author:     "Soma"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - 项目
+    - 实战
+---
+
+> 隔了几天，继续。
+
+ 下载Virtual Box和Vagrant。
+
+cmd打开控制台，依次运行
+
+```java
+vagrant  //查看vagrant是否安装好
+vagrant init centos/7  //下载centos/7镜像
+vagrant up //运行容器
+vagrant ssh //连接
+```
+
+![image-20210521130850394](img/image-521-01.png)
+
+### 网络设置
+
+Vagrant 默认使用端口转发的方式 **需要绑定VirtualBox中的linux和Windows之间的端口**，需要不断设置端口映射。
+
+最好直接建立连接
+
+打开Vagrantfile 修改<code>  config.vm.network "private_network", ip: "192.168.56.10"</code>使他和Windows中的virtualboxde IP地址前三个一样
+
+![image-20210521133457800](img/image-521-02.png)
+
+然后ping一下测试一下，可以ping通就行了
+
+### 安装docker
+
+虚拟化容器技术。Docker基于镜像，可以秒级启动各种容器。每一种容器都是一个完整的运行环境，容器之间相互隔离。
+
+安装教程可见官网和[菜鸟教程](https://www.runoob.com/docker/centos-docker-install.html)
+
+### 安装Mysql和Redis
+
+<code>sudo docker pull mysql:5.7</code>
+
+<code>sudo docker pull redis</code>
+
+开发环境为**Idea + Maven + git**
+
+> 至此，环境差不多搭建完成，后续再完善。
+
+---------------
+
+### 开发
+
+![image-20210521152446205](img/image-521-03.png)
+
+创建一些服务模块，如商品服务、会员服务、仓库服务、优惠券服务、订单服务等。
+
+将其初始化结构推送到git
+
+将数据库连接到linux系统中的mysql，导入sql文件，我用的可视化工具是**NaviCat**。
+
+这样所有准备工作应该差不多了。
+
+前几天一直在忙专利的事，加上身体有点不舒服，就没怎么搞。
+
+今天晚上有两场笔试，笔完刷一刷题，明天打算做后台管理系统，当然并不是我完全从头到尾写，找一个能用的工程来改进改进。
+
+------------
+
+——Soma 2021.5.21 16:22
+
