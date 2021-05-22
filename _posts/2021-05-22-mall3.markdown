@@ -1,0 +1,90 @@
+---
+layout:     post
+title:      "Mall开发第3天"
+subtitle:   " \"Mall\""
+date:       2021-05-22 12:00:00
+author:     "Soma"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - 项目
+    - 实战
+---
+
+> 隔了几天，继续。
+
+> 今天开始整后台的，今天的目标大概是能把后台这个项目先跑通了
+
+### 后台管理系统
+
+后台管理系统是直接用了一个开源的项目，我们主要关注里面的业务内容以及如何实现高并发高可用高性能这些功能。
+
+![](/img/image-522-01.png)
+
+将配置文件中的数据库连接信息改为我们自己的，使用的数据源是Druid。
+
+尝试一下运行这个项目。
+
+> 导入依赖ing.....
+
+![](/img/image-522-02.png)
+
+果然不出所料一片红。。。。
+
+一个一个开始找问题吧。。。。
+
+![](/img/image-522-03.png)
+
+查阅资料，发现是Spring-Cloud的版本号不太对，修改一下
+
+```xml
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>Hoxton.SR8</version>
+        <type>pom</type>
+        <scope>import</scope>
+    </dependency>
+```
+
+这样就解决了除了renren-fast的所有问题。
+
+它的问题也是在Plugins中，如果依赖没问题
+
+![](/img/image-522-04.png)
+
+因为依赖没问题，所以暂时先运行一下
+
+![](/img/image-522-05.png)
+
+这个问题大部分原因应该都是bean没有注入，一步一步往下看caused by，可以发现，定位到service层
+
+```java
+Caused by: org.quartz.JobPersistenceException: Couldn't retrieve trigger: Table 'gulimall_admin.QRTZ_TRIGGERS' doesn't exist
+```
+
+然后找到一行这样的错误信息，数据库gulimal_admin中的表不存在，那就说明可能是因为连接数据库哪里出问题了
+
+查看数据库中的这张表，发现是小写的，有可能是因为大小写问题导致的，所以我们需要在linux下的mysql配置文件中解决大小写敏感问题。
+
+![](/img/image-522-06.png)
+
+在my.cnf文件中加入一句
+
+```XML
+lower_case_table_names=1 //忽略大小写
+```
+
+然后重启mysql服务，再次尝试。。。
+
+![](/img/image-522-07.png)
+
+运行成功，因为这只是一个后台的项目，所以还需要搭建前端的项目。
+
+因为前端我还没怎么学，还好这个项目前后端的工程都有，明天我打算尝试一下用VSCode运行一下前端的项目，然后将前后端整合一下，看看能不能把项目的框架跑出来。
+
+Plugins的报红问题就先放一放。。。
+
+----------------
+
+——Soma 2021.5.22 19:14
