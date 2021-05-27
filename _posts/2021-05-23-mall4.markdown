@@ -1,0 +1,177 @@
+---
+layout:     post
+title:      "Mall开发第4天"
+subtitle:   " \"Mall\""
+date:       2021-05-23 12:00:00
+author:     "Soma"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - 项目
+    - 实战
+---
+
+> 开始前端项目的搭建
+
+### 前端项目的搭建
+
+前端我比较菜，就跟着做一做了。。。
+
+利用[Vscode](https://code.visualstudio.com/docs/?dv=win)运行前端代码
+
+安装node.js
+
+在控制台终端输入<dode>nmp install</code>下载要依赖的组件
+
+....
+
+果不其然，安装出错
+
+![image-20210524170737219](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210524170737219.png)
+
+![image-20210524170748213](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210524170748213.png)
+
+有两个 问题 一个是找不到python 一个而是node-sass安装失败。。。
+
+上网找解决办法。。。
+
+https://blog.csdn.net/weixin_30852419/article/details/97466863
+
+解决了半天，重新导入了一下，用这个链接的方法install可以了，但是依赖出问题了
+
+![image-20210525130931638](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210525130931638.png)
+
+依赖问题解决了。。。又出现了一个新的问题，Node-sass不支持当前的环境
+
+![image-20210525134548265](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210525134548265.png)
+
+![image-20210525140107287](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210525140107287.png)
+
+成了！验证码好像要从后台的某张表中获取，打开后台以及Linux的服务，获取了验证码成功登录，这样就完成了前后台的联调。
+
+### 逆向工程搭建
+
+修改一下工程中的配置文件，改为自己本地的配置就可以了
+
+![image-20210525201911439](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210525201911439.png)
+
+生成代码复制进我们的工程
+
+然后就会发现有一些依赖没有导入进来
+
+![image-20210527133258007](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210527133258007.png)
+
+再创建一个公共类的工程mall-common
+
+先导入Mybatis-plus保证dao层不报错，成功。
+
+导入lombok保证entity类不报错，成功。
+
+解决controller层和service层的导包问题。
+
+有一个分页工具类记录一下，这个是根据mybatis-plus提供的Ipage分页，帮助返回信息的。
+
+```java
+import com.baomidou.mybatisplus.core.metadata.IPage;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * 分页工具类
+ *
+ * @author Mark sunlightcs@gmail.com
+ */
+public class PageUtils implements Serializable {
+   private static final long serialVersionUID = 1L;
+   /**
+    * 总记录数
+    */
+   private int totalCount;
+   /**
+    * 每页记录数
+    */
+   private int pageSize;
+   /**
+    * 总页数
+    */
+   private int totalPage;
+   /**
+    * 当前页数
+    */
+   private int currPage;
+   /**
+    * 列表数据
+    */
+   private List<?> list;
+   
+   /**
+    * 分页
+    * @param list        列表数据
+    * @param totalCount  总记录数
+    * @param pageSize    每页记录数
+    * @param currPage    当前页数
+    */
+   public PageUtils(List<?> list, int totalCount, int pageSize, int currPage) {
+      this.list = list;
+      this.totalCount = totalCount;
+      this.pageSize = pageSize;
+      this.currPage = currPage;
+      this.totalPage = (int)Math.ceil((double)totalCount/pageSize);
+   }
+
+   /**
+    * 分页
+    */
+   public PageUtils(IPage<?> page) {
+      this.list = page.getRecords();
+      this.totalCount = (int)page.getTotal();
+      this.pageSize = (int)page.getSize();
+      this.currPage = (int)page.getCurrent();
+      this.totalPage = (int)page.getPages();
+   }
+```
+
+还有一个分页工具就是mybatis提供的pagehelper
+
+我使用下来感觉pagehelper可能更加方便一点，只需要调用一个startpage方法，之后的第一个sql起作用，代码来说比较简单，后续的工作就是mybatis拦截器自己做判断，数据都存在pageinfo里。Ipage虽然也是基于拦截器的，但是他需要在dao层写实现类page。
+
+好了现在service层都不报错了。
+
+最后解决controller层的问题
+
+```java
+@RequiresPermissions("mallproduct:attrattrgrouprelation:info")
+```
+
+这个是shiro的注解，就是用来验证用户是否登陆的
+
+为了让他先不报错，先把shiro的依赖导入进来，后面再考虑换成springsecurity
+
+这样暂时所有的报错问题就解决了。。。
+
+测试一下是否可以查出数据。。。
+
+```java
+@SpringBootTest
+class MallProductApplicationTests {
+   @Autowired
+   BrandService brandService;
+   @Test
+   void contextLoads() {
+      BrandEntity brandEntity = new BrandEntity();
+      brandEntity.setDescript("soma新增");
+      brandEntity.setName("新增品牌");
+      brandService.save(brandEntity);
+      System.out.println("成功...............");
+   }
+
+}
+```
+
+![image-20210527162937424](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210527162937424.png)
+
+测试成功。
+
+通过逆向工程将其他的模块的代码生成并测试通过就算完成了。
+
