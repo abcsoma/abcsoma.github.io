@@ -175,3 +175,6 @@ class MallProductApplicationTests {
 
 通过逆向工程将其他的模块的代码生成并测试通过就算完成了。
 
+-------------
+
+——Soma 2021.5.27 20:40
