@@ -77,7 +77,7 @@ dp[i][j] = dp[i-1][j-1]  //'.'
 
 
 
-```JAVA
+```java
 class Solution {
     public boolean isMatch(String s, String p) {
         int m = s.length();
