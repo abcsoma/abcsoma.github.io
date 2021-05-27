@@ -27,9 +27,9 @@ tags:
 
 果不其然，安装出错
 
-![image-20210524170737219](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210524170737219.png)
+![image-20210524170737219](/img/image-527-01.png)
 
-![image-20210524170748213](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210524170748213.png)
+![image-20210524170748213](/img/image-527-02.png)
 
 有两个 问题 一个是找不到python 一个而是node-sass安装失败。。。
 
@@ -39,13 +39,13 @@ https://blog.csdn.net/weixin_30852419/article/details/97466863
 
 解决了半天，重新导入了一下，用这个链接的方法install可以了，但是依赖出问题了
 
-![image-20210525130931638](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210525130931638.png)
+![image-20210525130931638](/img/image-527-03.png)
 
 依赖问题解决了。。。又出现了一个新的问题，Node-sass不支持当前的环境
 
-![image-20210525134548265](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210525134548265.png)
+![image-20210525134548265](/img/image-527-04.png)
 
-![image-20210525140107287](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210525140107287.png)
+![image-20210525140107287](/img/image-527-05.png)
 
 成了！验证码好像要从后台的某张表中获取，打开后台以及Linux的服务，获取了验证码成功登录，这样就完成了前后台的联调。
 
@@ -53,13 +53,13 @@ https://blog.csdn.net/weixin_30852419/article/details/97466863
 
 修改一下工程中的配置文件，改为自己本地的配置就可以了
 
-![image-20210525201911439](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210525201911439.png)
+![image-20210525201911439](/img/image-527-06.png)
 
 生成代码复制进我们的工程
 
 然后就会发现有一些依赖没有导入进来
 
-![image-20210527133258007](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210527133258007.png)
+![image-20210527133258007](/img/image-527-07.png)
 
 再创建一个公共类的工程mall-common
 
@@ -169,7 +169,7 @@ class MallProductApplicationTests {
 }
 ```
 
-![image-20210527162937424](C:\Users\Soma\AppData\Roaming\Typora\typora-user-images\image-20210527162937424.png)
+![image-20210527162937424](/img/image-527-08.png)
 
 测试成功。
 
