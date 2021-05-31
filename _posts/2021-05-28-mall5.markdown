@@ -1,0 +1,266 @@
+---
+layout:     post
+title:      "Mall开发第5天"
+subtitle:   " \"Mall\""
+date:       2021-05-28 12:00:00
+author:     "Soma"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - 项目
+    - 实战
+---
+
+> 开始前端项目的搭建
+
+> 前面完成了前后端项目框架的搭建，以及利用逆向工程生成了一些CRUD的代码，接下来进行分布式组件的学习
+
+### SpringCloud
+
+使用SpringCloud Alibaba ， 因为SpringCloud部分组件已经停止维护和更新，并且环境搭建和配置都比较复杂。
+
+### Nacos作为注册中心和配置中心
+
+nacos是针对微服务架构中的服务发现、配置管理、服务治理的综合型解决方案
+
+SpringCloud使用的是Eureka
+
+**配置中心**：将配置从各个应用中剥离出来，对配置进行统一管理
+
+在mall-common的pom.xml中导入
+
+```java
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+            <version>2.2.0.RELEASE</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+//这个是版本控制，以后导入springcloud相关组件就不需要写版本号了
+
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+</dependency>
+//导入服务注册与发现的依赖
+```
+
+因为在common中配置了，所以所有微服务都具有服务注册与发现的功能。
+
+下载Nacos server
+
+先在Windows上运行
+
+![image-20210528161038616](/img/image-528-01.png)
+
+他的端口号是8848，我们需要在我们微服务的的配置文件中连接到8848端口。
+
+然后添加注解<code>@EnableDiscoveryClient</code>
+
+启动一下看看有没有注册到注册中心
+
+发现没有，是因为没有给服务起名，起完名之后就有了
+
+![image-20210528164123877](/img/image-528-02.png)
+
+起两个服务测试一下，远程调用是否可用。
+
+假设产品服务需要调用优惠券服务，它就需要先去注册中心查看有哪些服务可用
+
+这里，我们使用Feign声明式远程调用
+
+### Feigh声明式远程调用
+
+Feign是一个声明式的HTTP客户端，也就是说他发送的是HTTP请求，它提供了HTTP请求模板，通过编写简单的接口和插入注解，就可以定义好HTTP请求的参数、格式、地址信息。
+
+要使一个服务具有远程调用别的服务的能力，就需要引入openfeigh依赖，这个是开源的。
+
+在product服务中写一个调用coupon服务的功能。
+
+编写一个接口，告诉SpringCloud需要调用远程服务
+
+```java
+package com.soma.mall.mallproduct.feign;
+
+
+import com.soma.common.utils.R;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Map;
+
+@FeignClient("mall-coupon")//告诉它要调用的是哪个服务
+public interface CouponFeignService {
+    @RequestMapping("/mallcoupon/coupon/product/list")//这里要写全
+    public R coupons();
+}
+```
+
+然后添加注解<code>@EnableFeignClients(basePackages = "com.soma.mall.mallproduct.feign")</code>开启远程调用
+
+在coupon服务中写的方法
+
+```java
+/**
+ * 远程调用测试
+ */
+@RequestMapping("/product/list")
+public R coupons(){
+    CouponEntity couponEntity = new CouponEntity();
+    couponEntity.setCouponName("满100-10");//优惠券的名字
+    return R.ok().put("coupons",Arrays.asList(couponEntity));
+}
+```
+
+product服务中调用
+
+```java
+@Autowired
+CouponFeignService couponFeignService;
+/**
+ *
+ * 测试远程调用
+ */
+@RequestMapping("/coupon")
+public R test(){
+    R coupon = couponFeignService.coupons();
+    coupon.get("coupons");
+    return R.ok().put("coupons",coupon);
+}
+```
+
+![image-20210528174016636](/img/image-528-03.png)
+
+启动服务可以看到调用成功了，至此远程调用也测试成功。
+
+### 测试Nacos配置中心
+
+common中添加依赖
+
+在每个服务的类路径下新建一个bootstrap.properties配置文件
+
+```java
+spring.application.name=mall-coupon
+spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+```
+
+在application.properties中随便写两个配置信息
+
+```java
+product.username = soma
+product.age = 25
+```
+
+之前是直接用@Value注解去获取配置文件中的值
+
+```java
+/**
+ * 配置测试
+ */
+@Value("${product.username}")
+private String name;
+@Value("${product.age}")
+private int age;
+
+@RequestMapping("/config")
+public R testConfig(){
+    return R.ok().put("name",name).put("age",age);
+}
+```
+
+在配置中心中添加配置文件mall-product.properties
+
+![image-20210528185127537](/img/image-528-04.png)
+
+添加@RefreshScope注解，就可以在不重启应用的情况下，完成对配置文件的修改。
+
+测试，修改age=28。
+
+![image-20210528192711046](/img/image-528-05.png)
+
+可以看到，我修改完nacos的配置文件服务能读取到我修改的数据，但是最终显示的还是application.properties中配置，也就是没有动态刷新。
+
+查阅资料说是最新版要单独引入bootstrap的启动器
+
+```java
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-bootstrap</artifactId>
+    <version>3.0.2</version>
+</dependency>
+```
+
+引入了还是一样。。。
+
+把所有配置文件都修改为yml文件就可以了。。。我也不懂为啥，那以后的配置文件都用yml就可以了。
+
+命名空间：可以使配置文件相隔离，区分不同的环境，以此来区分生产、测试、开发环境。这个直接在nacos中创建就可以了。用的时候只需要在bootstrap.properties配置上要使用的命名空间。或者为每个微服务都创建自己的命名空间，只加载自己命名空间下的所有配置。
+
+同时还可以为配置分组，修改group就行了。
+
+也可以做配置集群，将配置文件中的不同配置信息分组，拆分成不同的配置文件。
+
+![image-20210531162718684](/img/image-528-07.png)
+
+总结一下Nacos作为注册中心和配置中心的用法：
+
+- 作为注册中心
+  1. 首先导入服务注册与发现依赖
+  2. 然后在启动器上添加注解<code>@EnableDiscoveryClient</code>就可以将服务注册到注册中心中去
+- Feign声明式远程调用
+  1. 先引入开源工具openfeign的依赖
+  2. 然后编写一个接口去调用另一个服务，在接口上通过注解<code>@FeignClient</code>声明调用的是哪个服务
+  3. 然后在接口中编写调用的方法
+  4. 在启动器上通过注解<code>@EnableFeignClients</code>开启远程调用
+- Nacos配置中心
+  1. 导入配置中心的依赖
+  2. 创建一个bootstrap.yml的文件配置指向配置中心的地址
+  3. 在配置中心中按 前缀-spring.application.name-后缀.文件格式 的形式创建配置文件
+  4. 在调用配置文件配置数据的Controller层上添加<code>@RefreshScope</code>注解自动刷新配置中心的文件
+
+### API网关 Gateway
+
+网关就是用来进行路由转发、权限校验、限流控制
+
+创建一个新的Gateway模块
+
+导入服务注册与配置的依赖
+
+这里遇到一个问题就是spring-webflux的依赖问题
+
+就是可能gateway的内置依赖和springcloud的版本有冲突，我就重新导入了高版本，最终能运行成功，然后发现他是用netty写的，这里先做个记录，netty之后再学习。
+
+尝试写一个功能，根据url的不同，跳转到不同的页面。
+
+```yml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: baidu_route
+          uri: https://www.baidu.com
+          predicates:
+            - Query=url,baidu
+
+        - id: qq_route
+          uri: https://www.qq.com
+          predicates:
+            - Query=url,qq
+```
+
+![image-20210531195933643](/img/image-528-08.png)
+
+跳转成功！
+
+这样微服务的框架也差不多了，注册中心和配置中心以及网关都搭建完成。
+
+----------
+
+——Soma 2021.5.28 20:00
+
