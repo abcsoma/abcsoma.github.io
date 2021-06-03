@@ -1,0 +1,206 @@
+---
+layout:     post
+title:      "6.1刷题"
+subtitle:   " \"LeetCode+NowCoder\""
+date:       2021-06-01 12:00:00
+author:     "Soma"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - LeetCode
+    - 笔记
+---
+
+## [ LeetCode   删除链表的倒数第N个结点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
+
+> 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
+>
+> 进阶：你能尝试**使用一趟扫描**实现吗？
+>
+> 示例 1：
+>
+>
+> 输入：head = [1,2,3,4,5], n = 2
+> 输出：[1,2,3,5]
+> 示例 2：
+>
+> 输入：head = [1], n = 1
+> 输出：[]
+> 示例 3：
+>
+> 输入：head = [1,2], n = 1
+> 输出：[1]
+
+一般这种用快慢指针，就是第一个指针先走n步，然后第二个指针从头开始走，当第一个指针指向null时，第二个指针就指向倒数第n个结点，这个只需要一次扫描就能实现。
+
+```java
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode pre = new ListNode(0);//创建一个前驱结点
+        pre.next = head;
+        ListNode slow = pre,fast = pre;
+        while(n-->0){
+            fast = fast.next;
+        }
+        while(fast.next!=null){
+            fast = fast.next;
+            slow = slow.next;
+        }
+        slow.next = slow.next.next;
+        return pre.next;//这里不能直接返回head，因为有可能会把head删除
+    }
+}
+```
+
+找到倒数第n个结点也是这么做的，只不过不需要创建前驱结点，直接遍历就行了。
+
+## [ LeetCode   有效的括号](https://leetcode-cn.com/problems/valid-parentheses/)
+
+> 给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是否有效。
+>
+> 有效字符串需满足：
+>
+> 左括号必须用相同类型的右括号闭合。
+> 左括号必须以正确的顺序闭合。
+>
+>
+> 示例 1：
+>
+> 输入：s = "()"
+> 输出：true
+> 示例 2：
+>
+> 输入：s = "()[]{}"
+> 输出：true
+> 示例 3：
+>
+> 输入：s = "(]"
+> 输出：false
+> 示例 4：
+>
+> 输入：s = "([)]"
+> 输出：false
+> 示例 5：
+>
+> 输入：s = "{[]}"
+> 输出：true
+
+就新建一个辅助栈就行了。
+
+直接暴力判断yyds！
+
+```java
+class Solution {
+    public boolean isValid(String s) {
+        Stack<Character> stack = new Stack<>();
+        for(int i = 0;i<s.length();i++){
+            if(s.charAt(i)=='(' || s.charAt(i)=='[' || s.charAt(i)=='{'){
+                stack.push(s.charAt(i));
+            }else{
+                if(stack.size()!=0 && ((s.charAt(i)==')' && stack.peek()=='(') ||(s.charAt(i)==']' && stack.peek()=='[') ||(s.charAt(i)=='}' && stack.peek()=='{'))){
+                    stack.pop();
+                }else{
+                    return false;
+                }
+            }
+        }
+        if(stack.size()==0){
+            return true;
+        }
+        return false;
+    }
+}
+```
+
+去看看题解。。
+
+```java
+class Solution {
+    public boolean isValid(String s) {
+        int n = s.length();
+        if (n % 2 == 1) {
+            return false;
+        }
+
+        Map<Character, Character> pairs = new HashMap<Character, Character>() {{
+            put(')', '(');
+            put(']', '[');
+            put('}', '{');//思路和我也差不多，就是拿一个map存匹配括号
+        }};
+        Deque<Character> stack = new LinkedList<Character>();
+        for (int i = 0; i < n; i++) {
+            char ch = s.charAt(i);
+            if (pairs.containsKey(ch)) {
+                if (stack.isEmpty() || stack.peek() != pairs.get(ch)) {
+                    return false;
+                }
+                stack.pop();
+            } else {
+                stack.push(ch);
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+```
+
+## [ LeetCode   合并两个有序链表](https://leetcode-cn.com/problems/merge-two-sorted-lists/submissions/)
+
+迭代和递归两种方法。
+
+迭代
+
+```java
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode pre = new ListNode(0);
+        ListNode res = pre;
+        while(l1!=null && l2!=null){
+            if(l1.val < l2.val){
+                pre.next = l1;
+                l1 = l1.next;
+            }else{
+                pre.next = l2;
+                l2 = l2.next;
+            }
+            pre = pre.next;
+        }
+        while(l1!=null){
+            pre.next = l1;
+            l1 = l1.next;
+            pre = pre.next;
+        }       
+        while(l2!=null){
+            pre.next = l2;
+            l2 = l2.next;
+            pre = pre.next;
+        }
+        return res.next;
+    }
+}
+```
+
+递归
+
+```java
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if(l1==null){
+            return l2;
+        }else if(l2==null){
+            return l1;
+        }else if(l1.val < l2.val){
+            l1.next = mergeTwoLists(l1.next,l2);
+            return l1;
+        }else{
+            l2.next = mergeTwoLists(l1,l2.next);
+            return l2;
+        }
+    }
+}
+```
+
+--------
+
+——Soma 2021.6.3 20:10
+

@@ -1,0 +1,913 @@
+---
+layout:     post
+title:      "Mall开发第6天"
+subtitle:   " \"Mall\""
+date:       2021-06-01 12:00:00
+author:     "Soma"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - 项目
+    - 实战
+---
+
+> 开始前端项目的搭建
+
+前端项目主要是用javaScript语言，Vue框架，npm进行依赖管理。
+
+### ES6
+
+ECMAScript6是javascript语言的下一代标准。
+
+#### let声明变量
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        //第一个特性，可以使用let声明变量
+        //var和let声明变量
+        //1.var声明的变量往往会越域，let声明的变量有严格作用域
+        {
+            var a = 1;
+            let b = 2;
+        }
+        console.log(a);
+        console.log(b); //b is not defined
+        //2.var可以多次声明，let只能生命一次
+        {
+            var m = 1;
+            var m = 2;
+            let n = 3;
+            let n = 4;
+            console.log(m);
+            console.log(n);//Identifier 'n' has already been declared
+        }
+        //3.var会变量提升(将声明提升到作用域顶端去执行)，let不存在变量提升
+        console.log(x);//undefined
+        var x = 10;
+        console.log(y);//b is not defined
+        let y = 20;
+        
+
+        //const声明常量
+        const l = 1;
+    </script>
+</body>
+</html>
+```
+
+#### 解构表达式和字符串扩展
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        //传统方式获取数组中的值
+        let arr = [1,2,3];
+        let a = arr[0];
+        let b = arr[1];
+        let c = arr[2];
+        console.log(a,b,c);
+        //解构表达式
+        let [d,e,f] = arr;
+        console.log(a,b,c);
+
+        const person = {
+            name : "soma",
+            age : 25,
+            language : ['java','js','css']
+        }
+        const {name,age,language} = person;
+        console.log(name,age,language);
+
+        //字符串扩展
+        let str = "hello.vue";
+        console.log(str.startsWith("hello"));
+        console.log(str.endsWith(".vue"));
+        console.log(str.includes("e"));
+        console.log(str.includes("hello"));
+
+        //字符串模板、多行字符串
+        let ss = `acac
+        acac
+        vvvvv
+        ssss`;
+        console.log(ss);
+        //字符串插入变量 ${}
+        let info = `${name}+${age}`;
+        console.log(info);
+    </script>
+</body>
+</html>
+```
+
+#### 函数优化
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        //在参数声明的时候设定一个值，如果没有传，就赋默认值
+        function add(a,b = 1){
+            return a + b;
+        }
+        console.log(add(10));
+        //不定参数，可以传任意多个参数
+        function fun(...values){
+            console.log(values.length);
+        }
+        fun(1,2); //2
+        fun(1,2,3,4); //4
+
+        //箭头函数
+        var print = obj => console.log(obj);
+        print("hello");
+    </script>
+</body>
+</html>
+```
+
+#### 对象优化
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        const person = {
+            name: "jack",
+            age: 21,
+            language: ['java', 'js', 'css']
+        }
+
+        console.log(Object.keys(person));//["name", "age", "language"]
+        console.log(Object.values(person));//["jack", 21, Array(3)]
+        console.log(Object.entries(person));//[Array(2), Array(2), Array(2)] k-v
+
+        const target  = { a: 1 };
+        const source1 = { b: 2 };
+        const source2 = { c: 3 };
+
+        // 合并
+        //{a:1,b:2,c:3}
+        //assign方法
+        Object.assign(target, source1, source2);
+
+        console.log(target);//["name", "age", "language"]
+
+        //2）、声明对象简写
+        const age = 23
+        const name = "张三"
+        const person1 = { age: age, name: name }
+        // 等价于
+        const person2 = { age, name }//声明对象简写
+        console.log(person2);
+
+        //3）、对象的函数属性简写
+        let person3 = {
+            name: "jack",
+            // 以前：
+            eat: function (food) {
+                console.log(this.name + "在吃" + food);
+            },
+            //箭头函数this不能使用，要使用的话需要使用：对象.属性
+            eat2: food => console.log(person3.name + "在吃" + food),
+            eat3(food) {
+                console.log(this.name + "在吃" + food);
+            }
+        }
+
+        person3.eat("香蕉");
+        person3.eat2("苹果")
+        person3.eat3("橘子");
+
+        //4）、对象拓展运算符
+
+        // 1、拷贝对象（深拷贝）
+        let p1 = { name: "Amy", age: 15 }
+        let someone = { ...p1 }
+        console.log(someone)  //{name: "Amy", age: 15}
+
+        // 2、合并对象
+        let age1 = { age: 15 }
+        let name1 = { name: "Amy" }
+        let p2 = {name:"zhangsan"}
+        p2 = { ...age1, ...name1 } 
+        console.log(p2)
+    </script>
+</body>
+</html>
+```
+
+#### map、reduce方法
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        //map方法:接收一个函数，将原数组中的所有元素用这个函数处理有放入新数组返回
+        let arr = ['1','20','-5','3'];
+        arr = arr.map((item)=>item*2);
+        console.log(arr); //['2','40','-10'.'6']
+        //reduce方法,为数组中每个函数依次执行回调函数，接收四个参数，初始值，当前元素值，当前索引，调用reduce的数组
+        //arr.reduce(callback,[initialValue])
+        arr.reduce((a,b)=>{
+            console.log("上一次处理后的值"+a);
+            console.log("当前正在处理的值"+b);
+            return a+b;
+        },10);
+    </script>
+</body>
+</html>
+
+```
+
+#### promise
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+    <script>
+        //promise异步编排
+        //之前的嵌套调用
+        //1.查出当前用户信息
+        //2.根据当前用户id查询他的课程
+        //3.根据当前课程id查询出分数
+        $.ajax({
+            url: "mock/user.json",
+            success(data){
+                console.log("用户:",data);
+                $.ajax({
+                    url: `mock/user_corse_${data.id}.json`,
+                    success(data){
+                        console.log("查询到的课程:",data);
+                        $.ajax({
+                            url: `mock/user_score_${data.id}.json`,
+                            success(data){
+                                console.log("查询到的分数:",data);
+                            },
+                            error(error){
+                                console.log(error);
+                            }
+                        });
+                    },
+                    error(error){
+                        console.log(error);
+                    }
+                });
+            },
+            error(error){
+                console.log(error);
+            }
+        })
+
+        //promise封装异步操作
+        let p = new Promise((resolve,reject)=>{
+            //1.异步操作
+            $.ajax({
+                url: "mock/user.json",
+                success:function(data){
+                    console.log("查询用户成功:",data);
+                    resolve(data);
+                },
+                error:function(err){
+                    reject(error);
+                }
+            });
+        });
+
+        //成功用then,失败用catch
+        p.then((obj)=>{
+            return new Promise((resolve,reject)=>{
+                $.ajax({
+                    url: `mock/user_corse_${obj.id}.json`,
+                    success:function(data){
+                        console.log("查询课程成功:",data);
+                        resolve(data);
+                    },
+                    error:function(err){
+                        reject(error);
+                    }
+                });
+            })
+        }).then((data)=>{
+            $.ajax({
+                    url: `mock/user_score_${data.id}.json`,
+                    success:function(data){
+                        console.log("查询分数成功:",data.score);
+                    },
+                    error:function(err){
+                        console.log(err);
+                    }
+                });
+        })
+
+        function get(url, data) { //自己定义一个方法整合一下
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: url,
+                    data: data,
+                    success: function (data) {
+                        resolve(data);
+                    },
+                    error: function (err) {
+                        reject(err)
+                    }
+                })
+            });
+        }
+
+        get("mock/user.json")
+            .then((data) => {
+                console.log("用户查询成功~~~:", data)
+                return get(`mock/user_corse_${data.id}.json`);
+            })
+            .then((data) => {
+                console.log("课程查询成功~~~:", data)
+                return get(`mock/corse_score_${data.id}.json`);
+            })
+            .then((data)=>{
+                console.log("课程成绩查询成功~~~:", data)
+            })
+            .catch((err)=>{ //失败的话catch
+                console.log("出现异常",err)
+            });
+
+    </script>
+</body>
+</html>
+```
+
+#### 模块化
+
+主要由两个命令构成
+
+- export 命令用于规定模块的对外接口
+- import 命令用于导入其他模块提供的功能
+
+### Vue
+
+MVVM思想
+
+M：model 包括数据和一些基本操作
+V：view 视图，页面渲染结果
+VM：View-model，模型与视图间的双向操作（无需开发人员干涉）
+
+视图和数据通过VM绑定起来，model里有变化会自动地通过Directives填写到视view中，视图表单中添加了内容也会自动地通过DOM Listeners保存到模型中。
+
+新建一个Vue项目
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <input type="text" v-model="num"> 
+        <input type="text" v-model="name">
+        <button v-on:click="num++">点赞</button>
+        <button v-on:click="cancel">取消点赞</button>
+        <h1>{{name}},很帅,有{{num}}个人为他点赞</h1>
+    </div>
+    <script src="./node_modules/vue/dist/vue.js"></script>
+    <script>
+        //声明式渲染功能
+        //双向绑定
+        //事件处理v-xx
+        //创建vue实例，关联页面模板，将自己的数据渲染到关联的模板，响应式的，用指令来简化操作
+        let vm = new Vue({
+            el:"#app",
+            data:{
+                name: "soma",
+                num: 1
+            },
+            methods:{
+                cancel(){
+                    this.num -- ;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+#### 单向绑定v-bind与双向绑定v-model
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <!--插值表达式-->
+        {{msg}}  {{hello()}}<br/>
+        <!--取内容-->
+        <span v-html="msg"></span>  <br/>
+        <!--原样显示-->
+        <span v-text="msg"></span>
+        <!--给html标签的属性绑定-->
+        <a v-bind:href="link">gogogo</a>
+        <!--class,style-->
+        <span v-bind:class="{actice:isActive,'text-danger':hasError}"
+        v-bind:style="{color: color1,'font-size': size}">你好</span>
+        <!--表单项，自定义组件-->
+        精通的语言：
+        <input type="checkbox" v-model="language" value="java">java <br/>
+        <input type="checkbox" v-model="language" value="python">python <br/>
+        <input type="checkbox" v-model="language" value="go">go <br/>
+        选中了哪些:
+        {{language.join(",")}}
+    </div>
+
+
+    <script src="./node_modules/vue/dist/vue.js"></script>
+
+    <script>
+        let vm = new Vue({
+            el:"#app",
+            data:{
+                msg:"<h1>Hello</h1>",
+                link:"http://www.baidu.com",
+                isActive:true,
+                hasError:true,
+                color1:'blue',
+                size: '36px',
+                language: []
+            },
+            methods:{
+                hello(){
+                    return "Hello"
+                }
+            }
+        })
+    </script>
+
+</body>
+</html>
+```
+
+#### v-on作事件修饰符
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="./node_modules/vue/dist/vue.js"></script>
+
+    <div id="app">
+        <button v-on:click="num++">点赞</button>
+        <button v-on:click="cancel">取消</button>
+
+        <h1>有{{num}}个赞</h1>
+
+
+
+
+        <!-- 事件修饰符 -->
+        <div style="border: 1px solid red;padding: 20px;" v-on:click.once="hello">
+            大div
+            <!--.stop可以阻止冒泡，就是小div调用了hello不会再在大div调用hello-->
+            <div style="border: 1px solid blue;padding: 20px;" @click.stop="hello">
+                小div <br />
+                <a href="http://www.baidu.com" @click.prevent.stop="hello">去百度</a>
+            </div>
+        </div>
+
+        <!--按键修饰符-->
+        <input type="text" v-model="number" v-on:keyup.up="number+=2" @keyup.down="number-=2" @click.ctrl="number=10"><br/>
+
+    </div>
+    <script>
+        new Vue({
+            el:"#app",
+            data: {
+                num: 1,
+                number: 1,
+            },
+            methods:{
+                cancel(){
+                    this.num--;
+                },
+                hello(){
+                    alert("点击了")
+                }
+            }
+        })
+    </script>
+
+</body>
+</html>
+```
+
+#### v-for遍历循环
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="./node_modules/vue/dist/vue.js"></script>
+
+    <div id="app">
+        <ul>
+            <li v-for="(user,index) in users" :key="user.name">
+                当前索引：{{index}}      {{user.name}} ==>  {{user.gender}}  ==>  {{user.age}}  <br/>
+
+                对象信息：
+                <span v-for="(v,k) in user">{{k}},{{v}}==></span>
+            </li>
+        </ul>
+
+    </div>
+
+    <script>         
+        let app = new Vue({
+            el: "#app",
+            data: {
+                users: [
+                { name: '柳岩', gender: '女', age: 21 },
+                { name: '张三', gender: '男', age: 18 },
+                { name: '范冰冰', gender: '女', age: 24 },
+                { name: '刘亦菲', gender: '女', age: 18 },
+                { name: '古力娜扎', gender: '女', age: 25 }
+                ],
+                nums: [1,2,3,4,4]
+            },
+        })
+    </script>
+
+</body>
+</html>
+```
+
+#### v-if条件判断
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- 
+        v-if，顾名思义，条件判断。当得到结果为true时，所在的元素才会被渲染。
+        v-show，当得到结果为true时，所在的元素才会被显示。 
+    -->
+    <div id="app">
+        <button v-on:click="show = !show">点我呀</button>
+        <!-- 1、使用v-if显示 -->
+        <h1 v-if="show">if=看到我....</h1>
+        <!-- 2、使用v-show显示 -->
+        <h1 v-show="show">show=看到我</h1>
+    </div>
+
+    <script src="../node_modules/vue/dist/vue.js"></script>
+        
+    <script>
+        let app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            }
+        })
+    </script>
+
+</body>
+
+</html>
+
+```
+
+#### v-else和v-else-if
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <button v-on:click="random=Math.random()">点我呀</button>
+        <span>{{random}}</span>
+
+        <h1 v-if="random>=0.75">
+            看到我啦? &gt;= 0.75
+        </h1>
+        <h1 v-else-if="random>=0.5">
+            看到我啦? &gt;= 0.5
+        </h1>
+        <h1 v-else-if="random>=0.2">
+            看到我啦? &gt;= 0.2
+        </h1>
+        <h1 v-else>
+            看到我啦? &lt; 0.2
+        </h1>
+
+    </div>
+
+
+    <script src="../node_modules/vue/dist/vue.js"></script>
+        
+    <script>         
+        let app = new Vue({
+            el: "#app",
+            data: { random: 1 }
+        })     
+    </script>
+</body>
+
+</html>
+
+```
+
+#### 计算属性和侦听器
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <!-- 某些结果是基于之前数据实时计算出来的，我们可以利用计算属性。来完成 -->
+        <ul>
+            <li>西游记； 价格：{{xyjPrice}}，数量：<input type="number" v-model="xyjNum"> </li>
+            <li>水浒传； 价格：{{shzPrice}}，数量：<input type="number" v-model="shzNum"> </li>
+            <li>总价：{{totalPrice}}</li>
+            {{msg}}
+        </ul>
+    </div>
+    <script src="../node_modules/vue/dist/vue.js"></script>
+
+    <script>
+        //watch可以让我们监控一个值的变化，做出相应的反应
+        new Vue({
+            el:"#app",
+            data:{
+                xyjPrice: 99.98,
+                shzPrice: 98.00,
+                xyjNum: 1,
+                shzNum: 1,
+                msg:""
+            },
+            computed:{
+                totalPrice(){
+                    return this.xyjPrice * this.xyjNum + this.shzPrice * this.shzNum;
+                }
+            },
+            watch:{
+                xyjNum:function(newVal,oldVal){
+                    alert("newVal"+newVal+"oldVal"+oldVal)
+                    if(newVal>3){
+                        this.msg = "库存超出限制";
+                        this.xyjNum = 3;
+                    }else{
+                        this.msg = "";
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+有点购物车的意思了。。
+
+#### 过滤器
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- 过滤器常用来处理文本格式化的操作。过滤器可以用在两个地方：双花括号插值和 v-bind 表达式 -->
+    <div id="app">
+        <ul>
+            <li v-for="user in userList">
+                {{user.id}} ==> {{user.name}} ==> {{user.gender == 1?"男":"女"}} ==>
+                {{user.gender | genderFilter}} ==> {{user.gender | gFilter}}
+            </li>
+        </ul>
+    </div>
+    <script src="../node_modules/vue/dist/vue.js"></script>
+
+    <script>
+
+        // 全局过滤器
+        Vue.filter("gFilter", function (val) {
+            if (val == 1) {
+                return "男~~~";
+            } else {
+                return "女~~~";
+            }
+        })
+
+        let vm = new Vue({
+            el: "#app",
+            data: {
+                userList: [
+                    { id: 1, name: 'jacky', gender: 1 },
+                    { id: 2, name: 'peter', gender: 0 }
+                ]
+            },
+            filters: { // 局部过滤器，只可以在当前vue实例中使用
+                genderFilter(val) {
+                    if (val == 1) {
+                        return "男";
+                    } else {
+                        return "女";
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
+
+```
+
+#### 组件化
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <button v-on:click="count++">我被点击了{{count}}次</button>
+
+        <counter></counter>
+
+        <button-counter></button-counter>
+
+    </div>
+
+    <script src="./node_modules/vue/dist/vue.js"></script>
+    <script>
+        //全局组件
+        Vue.component("counter",{
+            template:  '<button v-on:click="count++">我被点击了{{count}}次</button>',
+            data(){
+                return {
+                    count:1
+                }
+            }
+        });
+
+        //局部声明
+        const buttonCounter = {
+            template:  '<button v-on:click="count++">我被点击了{{count}}次</button>',
+            data(){
+                return {
+                    count:1
+                }
+            }
+        };
+        new Vue({
+            el: "#app",
+            data:{
+                count:1
+            },
+            components:{
+                'button-counter' : buttonCounter
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+#### 生命周期和钩子函数（监听）
+
+![Vue 实例生命周期](/img/image-603-01.png)
+
+#### 模块化开发
+
+自己编写组件
+
+```html
+<template>
+    <div>
+        <h1>你好，hello，{{name}}</h1>
+    </div>
+</template>
+
+<script>
+export default {
+    data(){
+        return {
+            name: "张三"
+        }
+    }
+}
+</script>
+
+<style>
+
+</style>
+```
+
+#### Element UI
+
+是vue的一个组件库
+
+需要加什么组件就只需要去官方文档上去找，然后修改相关数据就行了。
+
+----------
+
+——Soma 2021.6.3 20:00
+
