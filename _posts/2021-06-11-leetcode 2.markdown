@@ -1,0 +1,256 @@
+---
+layout:     post
+title:      "6.11刷题"
+subtitle:   " \"LeetCode+NowCoder\""
+date:       2021-06-11 12:00:00
+author:     "Soma"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - LeetCode
+    - 笔记
+---
+
+## [反转链表](https://leetcode-cn.com/problems/reverse-linked-list/)
+
+经典反转链表
+
+```java
+//迭代
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if(head == null) {
+            return head;
+        }
+        ListNode pre = null;
+        ListNode cur = head;
+        while(cur != null) {
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+}
+//递归
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if(head == null || head.next == null) {
+            return head;
+        }
+        ListNode cur = reverseList(head.next);
+        head.next.next = head;
+        head.next = null;
+        return cur;
+    }
+}
+```
+
+## [反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/)
+
+> 给你单链表的头指针 head 和两个整数 left 和 right ，其中 left <= right 。请你反转从位置 left 到位置 right 的链表节点，返回 反转后的链表 。
+>
+>
+> 示例 1：
+>
+>
+> 输入：head = [1,2,3,4,5], left = 2, right = 4
+> 输出：[1,4,3,2,5]
+> 示例 2：
+>
+> 输入：head = [5], left = 1, right = 1
+> 输出：[5]
+
+```java
+    public ListNode reverseBetween(ListNode head, int left, int right) {
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        ListNode pre = dummy;
+        for(int i = 1; i < left; i++) {
+            pre = pre.next;
+        }
+        ListNode rightNode = pre;
+        for(int i = left; i < right + 1; i++) {
+            rightNode = rightNode.next;
+        }
+        ListNode leftNode = pre.next;
+        ListNode cur = rightNode.next;
+
+        //切割
+        pre.next = null;
+        rightNode.next = null;
+
+        reverse(leftNode);
+
+        pre.next = rightNode;
+        leftNode.next = cur;
+
+        return dummy.next;//不能用head，因为head有可能会被反转
+        
+    }
+
+    public ListNode reverse(ListNode head) {
+        if(head == null || head.next == null) {
+            return head;
+        }
+        ListNode pre = null;
+        ListNode cur = head;
+        while(cur != null) {
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+
+
+//头插法
+class Solution {
+    public ListNode reverseBetween(ListNode head, int left, int right) {
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        ListNode pre = dummy;
+        for(int i = 0; i < left - 1; i++) {
+            pre = pre.next;
+        }
+        ListNode cur = pre.next;
+        ListNode next;
+        for(int i = left; i < right; i++) {
+            next = cur.next;
+            cur.next = next.next;
+            next.next = pre.next;
+            pre.next = next;
+        }
+        return dummy.next;
+    }
+}
+```
+
+## [回文链表](https://leetcode-cn.com/problems/palindrome-linked-list/)
+
+> 请判断一个链表是否为回文链表。
+>
+> **示例 1:**
+>
+> ```
+> 输入: 1->2
+> 输出: false
+> ```
+>
+> **示例 2:**
+>
+> ```
+> 输入: 1->2->2->1
+> 输出: true
+> ```
+
+你确定这个是简单题吗
+
+```java
+class Solution {
+    public boolean isPalindrome(ListNode head) {
+        ListNode halfEnd = leftEnd(head);
+        //翻转后一半
+        ListNode halfStart = reverse(halfEnd.next);
+        ListNode start = head;
+        while(halfStart != null) {
+            if(start.val != halfStart.val) {
+                return false;
+            }
+            start = start.next;
+            halfStart = halfStart.next;
+        }
+        return true;
+    }
+    public ListNode reverse(ListNode head) {
+        if(head == null || head.next == null) {
+            return head;
+        }
+        ListNode pre = null;
+        ListNode cur = head;
+        while(cur != null) {
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+    public ListNode leftEnd(ListNode head) {
+        ListNode slow = head;
+        ListNode fast = head;
+        while(fast.next != null && fast.next.next !=null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+}
+```
+
+## [K 个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group/)
+
+> 给你一个链表，每 k 个节点一组进行翻转，请你返回翻转后的链表。
+>
+> k 是一个正整数，它的值小于或等于链表的长度。
+>
+> 如果节点总数不是 k 的整数倍，那么请将最后剩余的节点保持原有顺序。
+
+```java
+class Solution {
+    public ListNode reverseKGroup(ListNode head, int k) {
+        if(head == null || head.next == null) {
+            return head;
+        }
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        
+        ListNode pre = dummy;
+        ListNode end = dummy;
+
+        while(end.next != null) {
+            //end.next != null说明还得继续遍历下一组k
+            for(int i = 0; i < k && end != null; i++) {
+                //这里end ！= null说明遍历中不能跳出
+                end = end.next;
+            }
+            if(end == null) {
+                break;
+            }
+            //此时，pre为要翻转的节点的前一个，end为要翻转的链表最后一个节点
+            ListNode start = pre.next;
+            ListNode next = end.next;
+
+            end.next = null;
+            pre.next = reverse(start);
+
+            start.next = next;
+            pre = start;
+            end = pre;
+        }
+        return dummy.next;
+        
+    }
+
+    public ListNode reverse(ListNode head) {
+        ListNode pre = null;
+        ListNode cur = head;
+        while(cur != null) {
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+}
+```
+
+反转链表，核心还是先把最基础的反转链表写出来，然后将链表拆开翻转。
+
+--------
+
+——Soma 2021.6.11 23:00
+
