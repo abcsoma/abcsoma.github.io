@@ -1,0 +1,155 @@
+---
+layout:     post
+title:      "6.13刷题"
+subtitle:   " \"LeetCode+NowCoder\""
+date:       2021-06-13 12:00:00
+author:     "Soma"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - LeetCode
+    - 笔记
+---
+
+## [删除链表的倒数第 N 个结点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
+
+> 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
+>
+> 进阶：你能尝试使用一趟扫描实现吗？
+>
+>  
+>
+> 示例 1：
+>
+>
+> 输入：head = [1,2,3,4,5], n = 2
+> 输出：[1,2,3,5]
+> 示例 2：
+>
+> 输入：head = [1], n = 1
+> 输出：[]
+> 示例 3：
+>
+> 输入：head = [1,2], n = 1
+> 输出：[1]
+
+这个算是很常见的题目了，思路就是快慢指针，快指针先走n步，然后慢指针再开始和快指针一起走，当快指针走到null的时候，慢指针所在节点就是要删除的节点。
+
+```java
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+
+        ListNode first = head;
+        ListNode second = dummy;
+
+        for(int i = 0; i < n; i++) {
+            first = first.next;
+        }
+
+        while(first != null) {
+            first = first.next;
+            second = second.next;
+        }
+        second.next = second.next.next;
+        
+        return dummy.next;
+    }
+}
+```
+
+## [链表相交](https://leetcode-cn.com/problems/intersection-of-two-linked-lists-lcci/)
+
+> 给你两个单链表的头节点 `headA` 和 `headB` ，请你找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 `null` 。
+
+也挺经典，双指针，分别从两个链表的头节点开始走，走到尾部从另一个链表的头节点开始走，当两个链表中存在相同的节点时，说明相交。
+
+```java
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if(headA == null || headB == null) {
+            return null;
+        }
+        ListNode p1 = headA, p2 = headB;
+
+      //这里挺奇怪的，不能用p1.next ！= null来判断，以后慎用吧
+        while(p1 != p2) {
+            p1 = p1 != null ? p1.next : headB;
+            p2 = p2 != null ? p2.next : headA;
+        }
+        return p1;
+    }
+}
+```
+
+## [环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
+
+> 给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+>
+> 为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。注意，pos 仅仅是用于标识环的情况，并不会作为参数传递到函数中。
+>
+> 说明：不允许修改给定的链表。
+>
+> 进阶：
+>
+> 你是否可以使用 O(1) 空间解决此题？
+>
+>
+> 示例 1：
+>
+> 输入：head = [3,2,0,-4], pos = 1
+> 输出：返回索引为 1 的链表节点
+> 解释：链表中有一个环，其尾部连接到第二个节点。
+> 示例 2：
+>
+> 输入：head = [1,2], pos = 0
+> 输出：返回索引为 0 的链表节点
+> 解释：链表中有一个环，其尾部连接到第一个节点。
+> 示例 3：
+>
+> 输入：head = [1], pos = -1
+> 输出：返回 null
+> 解释：链表中没有环。
+
+也算经典，就是快慢指针，如果有环，快指针最终会追上慢指针，如果没有环，快指针会走到null
+
+当然，这道题是进阶版，要找到环的入口。
+
+但无论如何，有环，快指针一定能追上慢指针。
+
+假设a为链表头到环入口的步数，b为环的步数。
+
+则在环中追上时，fast一定比slow多走nb步，fast走了2v步，slow走了v步，则v=nb，而slow走a+nb步一定能到达环的入口处，所以在fast追上slow时，将slow返回头节点就行了，然后slow和fast同步频，最终会在环入口相遇。
+
+```java
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        ListNode slow = head, fast = head;
+        while(true) {
+            if(fast == null || fast.next == null) {
+                return null;
+            }
+            slow = slow.next;
+            fast = fast.next.next;
+            if(slow == fast) {
+                break;
+            }
+        }
+        //此时就说明链表一定有环，将slow返回头节点
+        slow = head;
+        while(slow != fast) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+        return slow;
+    }
+}
+```
+
+今天写的都是经典题。
+
+--------
+
+——Soma 2021.6.13 23:00
+
